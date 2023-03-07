@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>My Lotto( 1~105)</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+</head>
+<body>
+    <button onclick="lotto_go()">로또추출</button>
+    <div id="lotto-div" style="width: 300px;border:1px solid gray;">
+
+    </div>
+</body>
+<script>
+    let fileName = "./lotto_data.csv";
+    let lottoData = {"lotto_1":[],"lotto_2":[],"lotto_3":[],"lotto_4":[],"lotto_5":[],"lotto_6":[] ,"lotto_all":[]};
+    let lotto_all = [];
+    $(function(){
+        $.ajax({
+            url:fileName
+            ,dataType:'text'
+            ,success:(data)=>{
+                let arr = data.split(/\r?\n|\r/);
+                $.each(arr,(i,v)=>{
+                    let t = v.split(",");
+                    lottoData.lotto_1.push(t[1]);
+                    lottoData.lotto_2.push(t[2]);
+                    lottoData.lotto_3.push(t[3]);
+                    lottoData.lotto_4.push(t[4]);
+                    lottoData.lotto_5.push(t[5]);
+                    lottoData.lotto_6.push(t[6]);
+                    let row = [] ;
+                    row.push(t[1]);
+                    row.push(t[2]);
+                    row.push(t[3]);
+                    row.push(t[4]);
+                    row.push(t[5]);
+                    row.push(t[6]);
+                    row = row.sort((a,b)=>parseInt(a)>parseInt(b)? 1:-1);
+                    lottoData.lotto_all.push(row.join(","));
+                })
+                for(let i = 1 ; i <=45 ; i++){
+                    lottoData.lotto_1.push(i);
+                    lottoData.lotto_2.push(i);
+                    lottoData.lotto_3.push(i);
+                    lottoData.lotto_4.push(i);
+                    lottoData.lotto_5.push(i);
+                    lottoData.lotto_6.push(i);
+                }
+            }
+        })
+    })
+    function lotto_go (){
+        let lotto = [];
+        let returnLotto = [];
+        for(let i = 1 ; i <=6 ; i ++){
+            let loop = true;
+            let obj = lottoData["lotto_"+i];
+            while(loop == true){
+                const randomValue = obj[Math.floor(Math.random() * obj.length)];
+                if(lotto.indexOf(parseInt(randomValue)) === -1){
+                    lotto.push(parseInt(randomValue));
+                    returnLotto.push(parseInt(randomValue));
+                    loop = false;
+                }
+            }
+        }
+        if(check(lotto) == true){
+            console.log(returnLotto);
+            $("#lotto-div").append(returnLotto.join(",")+"<br>");
+        }else{
+            lotto_go();
+        }
+
+    }
+
+    function check(obj){
+        let row = obj;
+        row = row.sort((a,b)=>parseInt(a)>parseInt(b)? 1:-1);
+        if(lottoData.lotto_all.indexOf(row.join(",")) == -1){
+
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+</script>
+</html>
